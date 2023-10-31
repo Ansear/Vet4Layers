@@ -17,7 +17,10 @@ public class LocationPerson : BaseEntity
     public int TertaryNumber { get; set; }
     public string CardinalSecondary { get; set; }
     public string Complement { get; set; }
-    public string IdPerson { get; set; }
+    public string ZipCode { get; set; }
+    public string IdClient { get; set; }
+    public Client Clients { get; set; }
+    [Required]
     public int IdCiudad { get; set; }
     public City Cities { get; set; }
 }

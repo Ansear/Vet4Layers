@@ -18,6 +18,6 @@ public class Appointment : BaseEntity
     public int IdPet {get;set;}
     public Pet Pets {get;set;}
     [Required]
-    public int Service {get;set;}
+    public int IdService {    get;set;}
     public Service Services {get;set;}
 }
