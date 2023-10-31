@@ -15,7 +15,16 @@ public class Vet4Context : DbContext
     DbSet<City> Cities { get; set; }
     DbSet<Country> Countries { get; set; }
     DbSet<Departament> Departaments { get; set; }
+    DbSet<Appointment> Appointments { get; set; }
+    DbSet<Breed> Breeds { get; set; }
+    DbSet<Client> Clients { get; set; }
+    DbSet<CustomerPhone> CustomerPhones { get; set; }
     DbSet<LocationPerson> LocationPeople { get; set; }
+    DbSet<Pet> Pets { get; set; }
+    DbSet<Rol> Rols { get; set; }
+    DbSet<Service> Services { get; set; }
+    DbSet<User> Users { get; set; }
+    DbSet<UserRol> UserRols { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

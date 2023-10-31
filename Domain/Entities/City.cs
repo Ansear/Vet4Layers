@@ -7,7 +7,7 @@ namespace Domain.Entities;
 public class City : BaseEntity
 {
     public string Name { get; set; }
-    public int IdDePartament { get; set; }
+    public int IdDepartament { get; set; }
     public Departament Departaments { get; set; }
-    public ICollection<Country> Countries { get; set; }
+    public LocationPerson LocationPerson { get; set; }
 }

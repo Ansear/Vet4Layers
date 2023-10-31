@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Persistence.Data.Configuration;
     public class ClientConfiguration : IEntityTypeConfiguration<Client>
@@ -13,10 +16,10 @@ namespace Persistence.Data.Configuration;
             builder.HasKey(c => c.Id);
             builder.Property(c => c.Id);
 
-            builder.Property(c => c.Name):IsRequired().HasMaxLength(50);
+            builder.Property(c => c.Name).IsRequired().HasMaxLength(50);
             
-            builder.Property(c => c.LastName):IsRequired().HasMaxLength(50);
+            builder.Property(c => c.LastName).IsRequired().HasMaxLength(50);
             
-            builder.Property(c => c.Email):IsRequired().HasMaxLength(80);
+            builder.Property(c => c.Email).IsRequired().HasMaxLength(80);
         }
     }

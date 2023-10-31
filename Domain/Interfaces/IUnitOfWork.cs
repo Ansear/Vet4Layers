@@ -9,7 +9,7 @@ public interface IUnitOfWork
     IAppointment Appointments { get; }
     ICity City { get; }
     IClient Clients { get; }
-    ILocationPerson LocationPersons { get; }
+    ILocationPerson LocationPeople { get; }
     ICustomerPhone CustomerPhones { get; }
     IDepartament Departaments { get; }
     IPet Pets { get; }

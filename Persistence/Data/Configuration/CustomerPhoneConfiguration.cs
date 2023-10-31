@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Persistence.Data.Configuration;
     public class CustomerPhoneConfiguration : IEntityTypeConfiguration<CustomerPhone>
@@ -16,6 +19,6 @@ namespace Persistence.Data.Configuration;
 
             builder.Property(cp => cp.Number).IsRequired().HasMaxLength(50);
 
-            builder.Property(cp => cp.Clients).WithMany(c => c.CustomerPhones).HasForeignKey(cp => cp.IdClient);IdClient
+            builder.HasOne(cp => cp.Clients).WithMany(c => c.CustomerPhones).HasForeignKey(cp => cp.IdClient);
         }
     }
