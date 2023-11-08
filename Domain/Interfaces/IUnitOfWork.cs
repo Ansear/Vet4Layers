@@ -7,7 +7,7 @@ namespace Domain.Interfaces;
 public interface IUnitOfWork
 {
     IAppointment Appointments { get; }
-    ICity City { get; }
+    ICity Cities { get; }
     IClient Clients { get; }
     ILocationPerson LocationPeople { get; }
     ICustomerPhone CustomerPhones { get; }
