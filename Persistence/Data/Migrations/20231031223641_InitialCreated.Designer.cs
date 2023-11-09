@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Data;
 
@@ -10,9 +11,11 @@ using Persistence.Data;
 namespace Persistence.Data.Migrations
 {
     [DbContext(typeof(Vet4Context))]
-    partial class Vet4ContextModelSnapshot : ModelSnapshot
+    [Migration("20231031223641_InitialCreated")]
+    partial class InitialCreated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,12 +123,17 @@ namespace Persistence.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.ToTable("Country", (string)null);
                 });
@@ -422,6 +430,13 @@ namespace Persistence.Data.Migrations
                     b.Navigation("Departaments");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Country", b =>
+                {
+                    b.HasOne("Domain.Entities.City", null)
+                        .WithMany("Countries")
+                        .HasForeignKey("CityId");
+                });
+
             modelBuilder.Entity("Domain.Entities.CustomerPhone", b =>
                 {
                     b.HasOne("Domain.Entities.Client", "Clients")
@@ -530,6 +545,8 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.City", b =>
                 {
+                    b.Navigation("Countries");
+
                     b.Navigation("LocationPerson");
                 });
 

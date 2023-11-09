@@ -7,11 +7,11 @@ using Domain.Interfaces;
 using Persistence.Data;
 
 namespace Application.Repository;
-public class AppointmentRepository : GenericRepository<Appointment>, IAppointment
+public class PetRepository : GenericRepository<Pet>, IPet
 {
     private readonly Vet4Context _context;
 
-    public AppointmentRepository(Vet4Context context) : base(context)
+    public PetRepository(Vet4Context context) : base(context)
     {
         _context = context;
     }
