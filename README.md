@@ -507,7 +507,57 @@ builder.Services.ConfigureCors();
 builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());       
 ```
 
-Pagina 26 Resolver Null Con AutoMapper
+### Generar el Override Al Metodo GetAllAsync
+
+Se genero en el repositorio de Country
+
+```csharp
+namespace Application.Repository;
+public class CountryRepository : GenericRepository<Country>, ICountry
+{
+    private readonly Vet4Context _context;
+    public CountryRepository(Vet4Context context) : base(context)
+    {
+        _context = context;
+    }
+    public override async Task<IEnumerable<Country>> GetAllAsync()
+    {
+        return await _context.Countries.Include(p=>p.Departaments).ToListAsync();
+    }
+}    
+```
+
+### Crear Dtos
+
+- Ruta = WebApi -> Crear Carpeta **_Dtos_** -> Crear Clases **_Dto_** necesarias
+
+```csharp
+namespace WebApi.Dtos;
+public class CountryDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}       
+```
+
+### Crear Profiles
+
+- Ruta = WebApi -> Crear Carpeta **_Profiles_** -> Crear Clase **_MappingProfiles.cs_**
+  
+  
+  
+  ```csharp
+  namespace WebApi.Profiles;
+  public class MappingProfiles : Profile
+  {
+      public MappingProfiles()
+      {
+          CreateMap<City, CityDto>().ReverseMap();
+          CreateMap<Country, CountryDto>().ReverseMap();
+          CreateMap<Departament, DepartamentDto>().ReverseMap();
+      }
+  }
+  ```
 
 ## Controladores
 
@@ -600,5 +650,3 @@ public class CountryController : BaseApiController
     }
 }           
 ```
-
-

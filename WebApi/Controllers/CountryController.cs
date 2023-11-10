@@ -6,6 +6,7 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Dtos;
 
 namespace WebApi.Controllers;
 public class CountryController : BaseApiController
@@ -47,7 +48,7 @@ public class CountryController : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Country>> Post(CountryDto countryDto)
     {
-        var country = _mapper.Map<Country>(CountryDto);
+        var country = _mapper.Map<Country>(countryDto);
         _unitOfWork.Countries.Add(country);
         await _unitOfWork.SaveAsync();
         if (country == null)
@@ -55,7 +56,7 @@ public class CountryController : BaseApiController
             return BadRequest();
         }
         countryDto.Id = country.Id;
-        return CreatedAtAction(nameof(Post), new { id = countryDto.Id }, CountryDto);
+        return CreatedAtAction(nameof(Post), new { id = countryDto.Id }, countryDto);
     }
 
     [HttpPut("{id}")]
