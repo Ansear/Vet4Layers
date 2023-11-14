@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Application.UnitOfWork;
 using AspNetCoreRateLimit;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace WebApi.Extensions;
 public static class ApplicationServiceExtension
@@ -45,5 +47,15 @@ public static class ApplicationServiceExtension
     public static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+    }
+
+    public static void ConfigureApiVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options => 
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ApiVersionReader = new QueryStringApiVersionReader("ver");//Variable que permitira especificar la version a utilizar en la petición
+        });
     }
 }

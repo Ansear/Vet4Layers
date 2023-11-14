@@ -545,19 +545,19 @@ public class CountryDto
 - Ruta = WebApi -> Crear Carpeta **_Profiles_** -> Crear Clase **_MappingProfiles.cs_**
   
   
-  
-  ```csharp
-  namespace WebApi.Profiles;
-  public class MappingProfiles : Profile
-  {
-      public MappingProfiles()
-      {
-          CreateMap<City, CityDto>().ReverseMap();
-          CreateMap<Country, CountryDto>().ReverseMap();
-          CreateMap<Departament, DepartamentDto>().ReverseMap();
-      }
-  }
-  ```
+
+```csharp
+namespace WebApi.Profiles;
+public class MappingProfiles : Profile
+{
+    public MappingProfiles()
+    {
+        CreateMap<Country, CountryDto>().ReverseMap().ForMember(o=>o.Departaments,                  d=>d.Ignore()); //Permite ignorar el mapeo del atributo y asi se previene el Null
+        CreateMap<City, CityDto>().ReverseMap();
+        CreateMap<Departament, DepartamentDto>().ReverseMap();
+    }
+}
+```
 
 ## Controladores
 
@@ -649,4 +649,167 @@ public class CountryController : BaseApiController
         return NoContent();
     }
 }           
+```
+
+## Rate Limiting
+
+Controlar numero de peticiones que se realizan hacia un recurso en un periodo determinado de tiempo
+
+- Ruta = WebApi -> Extensions -> ApplicationServiceExtension
+  
+  ```csharp
+  namespace WebApi.Extensions;
+  public static class ApplicationServiceExtension
+  {
+      public static void ConfigureRateLimiting(this IServiceCollection services) //Limite de Peticiones
+      {
+          services.AddMemoryCache();
+          services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+          services.AddInMemoryRateLimiting();
+          services.Configure<IpRateLimitOptions>(options =>
+          {
+              options.EnableEndpointRateLimiting = true;
+              options.StackBlockedRequests = false;
+              options.HttpStatusCode = 429;
+              options.RealIpHeader = "X-Real-IP";
+              options.GeneralRules = new List<RateLimitRule>
+              {
+                      new RateLimitRule
+                      {
+                          Endpoint = "*",
+                          Period = "10s", //Tiempo
+                          Limit = 2 //Cantidad de peticiones segun el tiempo
+                      }
+              };
+          });
+      }
+  }
+  ```
+
+### Inyectar en el program.cs
+
+- WebApi -> program.cs
+
+```csharp
+...
+using AspNetCoreRateLimit;
+...
+builder.Services.ConfigureCors();
+builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
+builder.Services.AddApplicationServices();
+builder.Services.ConfigureRateLimiting();
+app.UseCors("CorsPolicy");
+
+app.UseHttpsRedirection();
+app.UseIpRateLimiting();  
+```
+
+## Versionado Api
+
+Permite Implementar cambios en el webApi sin afectar el funcionamiento de las aplicaciones FrontEnd(Del lado del cliente)
+
+### Crear metodo de extension para el Versionado
+
+- Ruta = WebApi -> Extensions -> ApplicationServiceExtension
+
+```csharp
+namespace WebApi.Extensions;
+public static class ApplicationServiceExtension
+{    
+    ...
+    public static void ConfigureApiVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options => 
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0); //Especifica la version del WebApi                                        
+            options.AssumeDefaultVersionWhenUnspecified = true; // Toma La ultima version del WebApi si no se especifica
+        });
+    }
+    ...
+}
+```
+
+### Inyectar el servicio en el program.cs
+
+```csharp
+builder.Services.ConfigureCors();
+builder.Services.ConfigureApiVersioning();
+builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
+builder.Services.AddApplicationServices();
+builder.Services.ConfigureRateLimiting();
+```
+
+### Versionado con Query String
+
+Ej: Mostar los paises con sus departamentos hijos
+
+#### Crear Dto
+
+```csharp
+namespace WebApi.Dtos
+{
+    public class CountryXState
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<DepartamentDto> Departaments { get; set; }
+    }
+}
+```
+
+#### Mapear Dto
+
+```csharp
+namespace WebApi.Profiles;
+public class MappingProfiles : Profile
+{
+    public MappingProfiles()
+    {
+        CreateMap<Country, CountryDto>().ReverseMap().ForMember(o=>o.Departaments,                  d=>d.Ignore()); //Permite ignorar el mapeo del atributo y asi se previene el Null
+        CreateMap<City, CityDto>().ReverseMap();
+        CreateMap<Departament, DepartamentDto>().ReverseMap();
+        CreateMap<Country,CountryXState>().ReverseMap();
+    }
+}
+```
+
+#### Modificar  Controlador Pais implementando la nueva version de metodo get que retorna Paises con sus Departamentos hijos
+
+##### Aplicar las Anotaciones de Version Antes del inicio de la declaracion de la clase
+
+```csharp
+namespace WebApi.Controllers;
+[ApiVersion("1.0")]
+[ApiVersion("1.1")]
+public class CountryController : BaseApiController
+{
+...
+```
+
+```csharp
+    [HttpGet]
+    [MapToApiVersion("1.0")] //Indicar la version del endPoint
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<CountryDto>>> Get()
+    {
+        var countries = await _unitOfWork.Countries.GetAllAsync();
+        return _mapper.Map<List<CountryDto>>(countries);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<CountryDto>>> Get()
+    {
+        var countries = await _unitOfWork.Countries.GetAllAsync();
+        return _mapper.Map<List<CountryDto>>(countries);
+    }
+```
+
+### Modificar el metodo del versionado
+
+```csharp
+
 ```

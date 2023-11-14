@@ -15,7 +15,8 @@ public class MappingProfiles : Profile
         CreateMap<Appointment, AppointmentDto>().ReverseMap();
         CreateMap<Breed, BreedDto>().ReverseMap();
         CreateMap<City, CityDto>().ReverseMap();
-        CreateMap<Country, CountryDto>().ReverseMap();
+        CreateMap<Country, CountryDto>().ReverseMap().ForMember(o=>o.Departaments, d=>d.Ignore()); //Permite ignorar el mapeo del atributo y asi se previene el Null
+        CreateMap<Country,CountryXState>().ReverseMap();
         CreateMap<Departament, DepartamentDto>().ReverseMap();
         CreateMap<Client, ClientDto>().ReverseMap();
         CreateMap<CustomerPhone, CustomerPhoneDto>().ReverseMap();

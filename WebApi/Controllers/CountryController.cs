@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.Dtos;
 
 namespace WebApi.Controllers;
+[ApiVersion("1.0")]
+[ApiVersion("1.1")]
 public class CountryController : BaseApiController
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -21,6 +23,17 @@ public class CountryController : BaseApiController
     }
 
     [HttpGet]
+    [MapToApiVersion("1.0")] //Indicar la version del api
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<CountryDto>>> Get()
+    {
+        var countries = await _unitOfWork.Countries.GetAllAsync();
+        return _mapper.Map<List<CountryDto>>(countries);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<CountryDto>>> Get()
